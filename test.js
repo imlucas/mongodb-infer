@@ -1,4 +1,5 @@
-var infer = require('./');
+var infer = require('./'),
+  assert = require('assert');
 
 describe('infer', function(){
   it('should work', function(){
