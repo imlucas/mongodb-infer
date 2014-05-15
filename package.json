@@ -1,0 +1,22 @@
+{
+  "name": "mongodb-infer",
+  "version": "0.0.1",
+  "author": "Lucas Hrabovsky <hrabovsky.lucas@gmail.com> (http://imlucas.com)",
+  "description": "MongoDB schema inference",
+  "scripts": {
+    "test": "mocha"
+  },
+  "homepage": "http://github.com/imlucas/mongodb-infer",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/imlucas/mongodb-infer.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "regret": "^0.1.2",
+    "tableize": "0.0.4"
+  },
+  "devDependencies": {
+    "mocha": "^1.17.1"
+  }
+}
