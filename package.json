@@ -11,6 +11,10 @@
     "type": "git",
     "url": "git://github.com/imlucas/mongodb-infer.git"
   },
+  "keywords": [
+    "mongodb",
+    "mongodb.js"
+  ],
   "license": "MIT",
   "dependencies": {
     "regret": "^0.1.2",
