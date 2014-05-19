@@ -32,10 +32,10 @@ var infer = module.exports = function(sample, opts) {
     else if(regret('date', sample[key])){
       schema[key] = 'date';
     }
-    else if(key === 'lat'){
+    else if(key === 'lat' || key === 'latitude'){
       schema[key] = 'geo lat';
     }
-    else if(key === 'long'){
+    else if(key === 'long'  || key === 'longitude'){
       schema[key] = 'geo long';
     }
     return schema;

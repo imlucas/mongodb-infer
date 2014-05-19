@@ -46,4 +46,22 @@ describe('infer', function(){
 
       assert.deepEqual(expect, res);
   });
+
+  it('should see geo fully spelled out', function(){
+    var expect = { _id: 'string id',
+      id: 'number',
+      address: 'string',
+      latitude: 'geo lat',
+      longitude: 'geo long',
+      label: 'string'
+    }, res = infer({
+      "_id": "537a5a1f58ca78143e9b1730",
+      "id": 5020,
+      "address": "4622 7th Av",
+      "latitude": 40.6443901062012,
+      "longitude": -74.00422668457033,
+      "label": "Mr. C's Cycles"
+    });
+    assert.deepEqual(expect, res);
+  });
 });
