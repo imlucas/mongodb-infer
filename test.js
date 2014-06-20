@@ -4,21 +4,21 @@ var infer = require('./'),
 describe('infer', function(){
   it('should work', function(){
     var expect = {
-        _id: 'string id',
+        _id: 'string id objectId',
         service_request_id: 'number id',
         status: 'string',
         status_notes: 'string',
         service_name: 'string',
-        service_code: 'enum',
+        service_code: 'category',
         description: 'text',
         agency_responsible: 'string',
-        service_notice: 'object',
+        service_notice: null,
         requested_datetime: 'date',
         updated_datetime: 'date',
         expected_datetime: 'date',
         address: 'string',
         address_id: 'number id',
-        zipcode: 'enum',
+        zipcode: null,
         long: 'geo long',
         lat: 'geo lat',
         media_url: 'url'
@@ -44,11 +44,13 @@ describe('infer', function(){
         "media_url": null
       });
 
-      assert.deepEqual(expect, res);
+      Object.keys(expect).map(function(k){
+        assert.equal(expect[k], res[k], k  + ' is incorrect.  wanted `'+expect[k]+'` got `'+res[k]+'`');
+      });
   });
 
   it('should see geo fully spelled out', function(){
-    var expect = { _id: 'string id',
+    var expect = { _id: 'string id objectId',
       id: 'number',
       address: 'string',
       latitude: 'geo lat',
