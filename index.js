@@ -1,5 +1,6 @@
 var tableize = require('tableize'),
-  regret = require('regret');
+  regret = require('regret'),
+  pkg = require('./package.json');
 
 regret.add('date',
   /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d-[0-5]\d/,
@@ -41,3 +42,4 @@ var infer = module.exports = function(sample, opts) {
     return schema;
   }, {});
 };
+module.exports.version = pkg.version;
