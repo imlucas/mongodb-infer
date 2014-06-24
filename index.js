@@ -10,9 +10,65 @@ regret.add('objectId',
   /^[0-9a-fA-F]{24}$/,
   '536bfbaa0e132fd2563235f2');
 
-var infer = module.exports = function(sample, opts) {
+
+// If we return a a matrix result like so:
+// ```javascript
+// return {
+//   size: 40,
+//   fields: {
+//     _id: {
+//       types: {'string': 40, 'id': 40, 'objectId': 40},
+//       range: ['lowest id', 'highest id']
+//     },
+//     tags: {
+//       types: {'array': 30},
+//       range: ['shortest length', 'longest length']
+//     },
+//     'tags[n]': {
+//       'string': 30
+//     },
+//     'bookmarks': {
+//       'array': 30
+//     },
+//     'bookmarks[n]._id': {
+//       'string': 40
+//     },
+//     'bookmarks[n].name': {
+//       'string': 40
+//     }
+//   }
+// };
+// ```
+// Constructing training models using the
+// [json table schema](http://dataprotocols.org/json-table-schema/)
+// to test for the best fit would be trivial:
+// ```javascript
+// return {
+//     'a': {
+//       fields: [
+//         {
+//           name: '_id',
+//           type: 'objectId',
+//           // determined via collection indexes and sampled values.
+//           constraints: {required: true, unique: true}
+//         }
+//       ],
+//       primaryKey: '_id',
+//     },
+//     'a.t': {
+//     }
+//   }
+// };
+// ```
+
+function sample(docs, opts){
   opts = opts || {};
-  var obj = tableize(sample),
+  var table = opts.name || 'a';
+}
+
+var infer = module.exports = function(doc, opts) {
+  opts = opts || {};
+  var obj = tableize(doc),
     geo = [];
 
   return Object.keys(obj).reduce(function(schema, key){
@@ -36,11 +92,11 @@ var infer = module.exports = function(sample, opts) {
     }
     else if(/_id$/.test(key)){
       schema[key] += ' id';
-      if(regret('objectId', sample[key])){
+      if(regret('objectId', doc[key])){
         schema[key] += ' objectId';
       }
     }
-    else if(regret('date', sample[key])){
+    else if(regret('date', doc[key])){
       schema[key] = 'date';
     }
     else if(key === 'lat' || key === 'latitude'){
