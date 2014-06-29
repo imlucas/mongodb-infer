@@ -14,27 +14,48 @@ regret.add('objectId',
 // If we return a a matrix result like so:
 // ```javascript
 // return {
-//   size: 40,
+//   name: 'scope.users', // collection ns
+//   sample: 40,
+//   total: 12000,
 //   fields: {
 //     _id: {
-//       types: {'string': 40, 'id': 40, 'objectId': 40},
+//       type: 'objectId',
+//       unique: true,
+//       hints: {'string': 40, 'id': 40, 'objectId': 40},
 //       range: ['lowest id', 'highest id']
 //     },
 //     tags: {
-//       types: {'array': 30},
-//       range: ['shortest length', 'longest length']
+//       type: 'array',
+//       hints: {'array': 28, 'unset': 2},
+//       range: ['shortest array length', 'longest array length'],
+//       unique: false,  // some documents had the same tag sets? one tag to many users?
+//       items: {
+//         type: 'string',
+//         hints: {'string': 45},
+//         range: ['abba', 'zebra']
+//       }
 //     },
-//     'tags[n]': {
-//       'string': 30
-//     },
-//     'bookmarks': {
-//       'array': 30
-//     },
-//     'bookmarks[n]._id': {
-//       'string': 40
-//     },
-//     'bookmarks[n].name': {
-//       'string': 40
+//     bookmarks: {
+//       type: 'array',
+//       hints: {'array': 15, 'unset': 15},
+//       items: {
+//         type: 'object',
+//         hints: {'object': 15},
+//         range: ['shortest array length', 'longest array length'],
+//         unique: true, // many to many?
+//         properties: {
+//           _id: {
+//             type: 'string',
+//             hints: {'string': 15, 'id': 15}, // likely a foreign key
+//             range: ['you get', 'the idea']
+//           },
+//           name: {
+//             type: 'string',
+//             hints: {'string': 15},
+//             range: ['you get', 'the idea']
+//           }
+//         }
+//       }
 //     }
 //   }
 // };
