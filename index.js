@@ -93,15 +93,9 @@ var infer = module.exports = function(doc, opts) {
     geo = [];
 
   return Object.keys(obj).reduce(function(schema, key){
-    var val = obj[key];
-    var type = typeof val;
+    schema[key] = /\[object (\w+)\]/.exec(
+      Object.prototype.toString.call(obj[key]))[1].toLowerCase();
 
-    if(val === null){
-      schema[key] = null;
-    }
-    else if (type){
-      schema[key] = type;
-    }
     if(/_url$/.test(key)){
       schema[key] = 'url';
     }
