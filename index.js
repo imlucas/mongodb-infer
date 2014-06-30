@@ -10,6 +10,11 @@ regret.add('objectId',
   /^[0-9a-fA-F]{24}$/,
   '536bfbaa0e132fd2563235f2');
 
+regret.add('repr',
+  /\[object (\w+)\]/,
+  '[object Array]',
+  ['type']);
+
 
 // If we return a a matrix result like so:
 // ```javascript
@@ -84,7 +89,15 @@ regret.add('objectId',
 
 function sample(docs, opts){
   opts = opts || {};
-  var table = opts.name || 'a';
+  var res = {
+    title: (opts.name || 'a'),
+    sample: docs.length,
+    total: undefined
+  };
+
+  docs.map(function(doc){
+
+  });
 }
 
 var infer = module.exports = function(doc, opts) {
@@ -93,34 +106,69 @@ var infer = module.exports = function(doc, opts) {
     geo = [];
 
   return Object.keys(obj).reduce(function(schema, key){
-    schema[key] = /\[object (\w+)\]/.exec(
-      Object.prototype.toString.call(obj[key]))[1].toLowerCase();
+    schema[key] = {};
 
-    if(/_url$/.test(key)){
-      schema[key] = 'url';
+    var repr = Object.prototype.toString.call(obj[key]),
+      primitive = regret('repr', repr).type.toLowerCase();
+
+    if(primitive === 'array'){
+      schema[key] = array(key, obj[key]);
     }
-    else if(/_code$/.test(key)){
-      schema[key] = 'category';
-    }
-    else if(key === 'description' || key === 'summary'){
-      schema[key] = 'text';
-    }
-    else if(/_id$/.test(key)){
-      schema[key] += ' id';
-      if(regret('objectId', doc[key])){
-        schema[key] += ' objectId';
-      }
-    }
-    else if(regret('date', doc[key])){
-      schema[key] = 'date';
-    }
-    else if(key === 'lat' || key === 'latitude'){
-      schema[key] = 'geo lat';
-    }
-    else if(key === 'long'  || key === 'longitude'){
-      schema[key] = 'geo long';
+    else {
+      schema[key] = member(primitive, key, obj[key]);
     }
     return schema;
   }, {});
 };
+
+function array(key, value){
+  return {
+    type: 'array',
+    items: {}
+  };
+}
+
+function member(primitive, key, value){
+  var res = {
+    type: primitive,
+    hints: [primitive],
+    value: value
+  };
+
+  if(/_url$/.test(key)){
+    res.type = 'url';
+    res.hints.push('url');
+  }
+  else if(/_code$/.test(key)){
+    res.type = 'category';
+    res.hints.push('category');
+  }
+  else if(key === 'description' || key === 'summary'){
+    res.type = 'text';
+    res.hints.push('text');
+  }
+  else if(/_id$/.test(key)){
+    res.type = 'id';
+    res.hints.push('id');
+    if(regret('objectId', value)){
+      res.type = 'objectId';
+      res.hints.push('objectId');
+    }
+  }
+  else if(regret('date', value)){
+    res.type = 'date';
+    res.hints.push('date');
+  }
+  else if(key === 'lat' || key === 'latitude'){
+    res.type = 'latitude';
+    res.hints.push('geo');
+    res.hints.push('latitude');
+  }
+  else if(key === 'long'  || key === 'longitude'){
+    res.type = 'longitude';
+    res.hints.push('geo');
+    res.hints.push('longitude');
+  }
+  return res;
+}
 module.exports.version = pkg.version;
