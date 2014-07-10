@@ -19,7 +19,8 @@
   "license": "MIT",
   "dependencies": {
     "regret": "^0.1.2",
-    "tableize": "0.0.4"
+    "tableize": "0.0.4",
+    "underscore": "^1.6.0"
   },
   "devDependencies": {
     "browserify": "^4.1.6",
