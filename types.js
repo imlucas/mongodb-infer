@@ -1,82 +1,5 @@
 var _ = require('underscore');
 
-function Field (opts) {
-  this.type = opts.type;
-  this.title = opts.title || "";
-  this.description = opts.description || "";
-  this._history = [];
-  this._enum = false;
-}
-
-Field.prototype.aggregate = function (field) {
-  // aggregate with another field
-};
-
-Field.prototype.toSchema = function () {
-  // produce application/json+schema format
-};
-
-Field.prototype.stats = function () {
-  // show some stats
-};
-
-function INumber (num) {
-  if (!(this instanceof INumber)) return new INumber(num);
-  Field.call(this, { type: 'number' });
-  this._history.push(num);
-  this.maximum = num;
-  this.exclusiveMaximum = false;
-  this.minimum = num;
-  this.exclusiveMinimum = false;
-}
-
-function IBoolean (bool) {
-  if (!(this instanceof IBoolean)) return new IBoolean(bool);
-  Field.call(this, { type: 'boolean' });
-  this._history.push(bool);
-}
-
-function INull () {
-  if (!(this instanceof INull)) return new INull(bool);
-  Field.call(this, { type: 'null' });
-}
-
-function IString (str) {
-  if (!(this instanceof IString)) return new IString(str);
-  Field.call(this, { type: 'string' });
-  this._history.push(str);
-  this.pattern = null;
-  this.minLength = null;
-  this.maxLength = null;
-}
-
-function IArray (ar) {
-  if (!(this instanceof IArray)) return new IArray(ar);
-  Field.call(this, { type: 'array' });
-  this._history.push(ar);
-  this.items = null;
-  this.additionalItems = null;
-  this.minItems = null;
-  this.maxItems = null;
-  this.uniqueItems = true;
-}
-
-function IObject (obj) {
-  if (!(this instanceof IObject)) return new IObject(obj);
-  Field.call(this, { type: 'object' });
-  this._history.push(obj);
-  this.properties = null;
-  this.required = null;
-  this.patternProperties = null;
-  this.additionalProperties = null;
-  this.minProperties = null;
-  this.maxProperties = null;
-  this.items = null;
-  this.minItems = null;
-  this.maxItems = null;
-  this.uniqueItems = true;
-}
-
 var TYPES = {
   number:  'number',
   string:  'string',
@@ -88,111 +11,197 @@ var TYPES = {
 
 var NO_VALUE = function () { };
 var WILDCARD = { };
-var NOT_IMPLEMENTED = function () { throw new Error('nope'); };
 
-function build (obj, type) {
-  // determine input type
-  if (typeof type === 'undefined') {
-    switch(typeof obj) {
-      case 'number':
-        type = TYPES.number;
-        break;
-      case 'boolean':
-        type = TYPES.boolean;
-        break;
-      case 'string':
-        type = TYPES.string;
-        break;
-      case 'object':
-        if (obj === null) {
-          type = TYPES.null;
-        } else if (Array.isArray(obj)) {
-          type = TYPES.array;
-        } else {
-          type = TYPES.object;
-        }
-        break;
-      default:
-        NOT_IMPLEMENTED();
-    }
+function notImplementedException(method) {
+  this.message = 'Method name: ' + method;
+  this.name = 'NotImplementedException';
+}
+function illegalInputException(input) {
+  this.message = 'Attempted input: ' + input;
+  this.name = 'IllegalInputException';
+}
+
+function findType (obj) {
+  switch(typeof obj) {
+    case 'number':
+      return TYPES.number;
+    case 'boolean':
+      return TYPES.boolean;
+    case 'string':
+      return TYPES.string;
+    case 'object':
+      if (obj === null) {
+        return TYPES.null;
+      } else if (Array.isArray(obj)) {
+        return TYPES.array;
+      } else {
+        return TYPES.object;
+      }
   }
+  throw illegalInputException('type');
+}
+
+/*
+ * builder
+ */
+
+function build (value, key, type) {
+  // determine input type
+  type = type in TYPES ? type : findType(value);
   // construct AST based on type
   switch (type) {
-    case TYPES.number:
-      return {
-        type: TYPES.number,
-        history: new Dictionary(obj),
-        min: obj,
-        max: obj
-      };
-    case TYPES.string:
-      return {
-        type: TYPES.string,
-        history: new Dictionary(obj),
-        pattern: NO_VALUE,
-        minLength: obj.length,
-        maxLength: obj.length
-      };
     case TYPES.null:
       return {
-        type: TYPES.null
+        type: TYPES.null,
+        counter: new Dictionary() // placeholder
       };
     case TYPES.boolean:
       return {
         type: TYPES.boolean,
-        history: new Dictionary(obj)
+        counter: new Dictionary(value)
       };
+    case TYPES.number:
+      return buildNumber(value, key);
+    case TYPES.string:
+      return buildString(value, key);
     case TYPES.array:
-      var items = [];
-      obj.forEach(function (item) {
-        items.push(build(item));
-      });
-      return {
-        type: TYPES.array,
-        items: items.reduce(aggregate, WILDCARD)
-      };
+      return buildArray(value, key);
     case TYPES.object:
-      var prop = {};
-      Object.keys(obj).forEach(function (k) {
-        prop[k] = build(obj[k]);
-      });
-      return {
-        type: TYPES.object,
-        properties: prop,
-        required: Object.keys(obj)
-      };
-    default:
-      NOT_IMPLEMENTED();
+      return buildObject(value, key);
   }
+  throw illegalInputException('type');
 }
 
+function buildNumber (num, key) {
+  return {
+    type: TYPES.number,
+    counter: new Dictionary(num),
+    min: num,
+    max: num
+  };
+}
+
+function buildString (str, key) {
+  return {
+    type: TYPES.string,
+    counter: new Dictionary(str),
+    pattern: NO_VALUE
+  };
+}
+
+function buildArray (ar, key) {
+  var items = [];
+  ar.forEach(function (item) {
+    items.push(build(item));
+  });
+  return {
+    type: TYPES.array,
+    items: items.reduce(aggregate, WILDCARD)
+  };
+}
+
+function buildObject (obj, key) {
+  var prop = {};
+  var propCounter = new Dictionary();
+  Object.keys(obj).forEach(function (k) {
+    prop[k] = build(obj[k], k);
+    propCounter.put(k, 1);
+  });
+  return {
+    type: TYPES.object,
+    properties: prop,
+    required: Object.keys(obj),
+    propCounter: propCounter
+  };
+}
+
+/*
+ * aggregation
+ */
+
 function aggregate (obj1, obj2) {
-  // should not merge objects
   console.log('----');
   console.log(obj1);
   console.log(obj2);
-  if (obj1 === WILDCARD) {
-    return obj2;
-  } else if (obj1.type === obj2.type) {
+  if (obj1 === WILDCARD) return obj2;
+  if (obj2 === WILDCARD) return obj1;
+  if (obj1.type !== obj2.type) {
+    // ! different complex type? [1,2] !== [1,2]
+    // fields with dynamic types
     return {
-      type: obj1.type,
-      history: obj1.history.merge(obj2.history)
+      type: _.flatten(_.union([obj1.type], [obj2.type])),
+      counter: obj1.counter.merge(obj2.counter)
     };
-  } else {
-    // not supported yet
-    NOT_IMPLEMENTED();
   }
+  // normal cases
+  if (obj1.type === TYPES.object) return aggObject(obj1, obj2);
+  if (obj1.type === TYPES.array) return aggArray(obj1, obj2);
+  if (obj1.type === TYPES.string) return aggString(obj1, obj2);
+  if (obj1.type === TYPES.number) return aggNumber(obj1, obj2);
+  return {
+    type: obj1.type,
+    counter: obj1.counter.merge(obj2.counter)
+  };
 }
+
+function aggNumber (num1, num2) {
+  return {
+    type: TYPES.number,
+    counter: num1.counter.merge(num2.counter),
+    min: Math.min(num1.min, num2.min),
+    max: Math.max(num1.max, num2.max)
+  };
+}
+
+function aggString (str1, str2) {
+  return {
+    type: str1.type,
+    counter: str1.counter.merge(str2.counter)
+  };
+}
+
+function aggArray (ar1, ar2) {
+  throw notImplementedException('aggArray');
+}
+
+function aggObject (obj1, obj2) {
+  var props = {};
+  Object.keys(obj1.properties).forEach(function (k) {
+    if (k in obj2.properties) {
+      props[k] = aggregate(obj1.properties[k], obj2.properties[k]);
+    } else {
+      props[k] = obj1.properties[k];
+    }
+  });
+  Object.keys(obj2.properties).forEach(function (k) {
+    if (!(k in props)) {
+      props[k] = obj2.properties[k];
+    }
+  });
+  return {
+    type: TYPES.object,
+    required: _.intersection(obj1.required, obj2.required),
+    properties: props,
+    propCounter: obj1.propCounter.merge(obj2.propCounter)
+  };
+}
+
+/*
+ * utility
+ */
 
 // some fantastic dictionary that supports cool statistical analysis
 function Dictionary(initial) {
   this.dict = {};
   if (initial !== undefined) this.put(initial, 1);
 }
-Dictionary.prototype.get = function (k) { return this.dict[k]; };
+Dictionary.prototype.get = function (k) {
+  if (k in this.dict) return this.dict[k];
+  return (this.dict[k] = 0);
+};
 Dictionary.prototype.put = function (k, v) {
-  if (k in this.dict) this.dict[k] += v;
-  else this.dict[k] = v;
+  if (k in this.dict) return (this.dict[k] += v);
+  return (this.dict[k] = v);
 };
 Dictionary.prototype.merge = function (d) {
   var ret = new Dictionary();
@@ -207,3 +216,4 @@ Dictionary.prototype.toString = function () {
 };
 
 module.exports.build = build;
+module.exports.aggregate = aggregate;
