@@ -120,9 +120,6 @@ function buildObject (obj, key) {
  */
 
 function aggregate (obj1, obj2) {
-  console.log('----');
-  console.log(obj1);
-  console.log(obj2);
   if (obj1 === WILDCARD) return obj2;
   if (obj2 === WILDCARD) return obj1;
   if (obj1.type !== obj2.type) {
