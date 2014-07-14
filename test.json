@@ -1,0 +1,5 @@
+{ "_id": 1, "string": "A", "boolean":  true, "array": [     ], "object": { "zero": 0, "one":  1} }
+{ "_id": 2, "string": "B", "boolean":  true, "array": [ "B" ], "object": { "zero": 0, "two":  2} }
+{ "_id": 3, "string": "C", "boolean": false, "array": [ "D" ], "object": { "zero": 0, "one": -1} }
+{ "_id": 4, "string": "B", "boolean": false, "array": [ "D" ], "object": { "zero": 0, "three": 3 } }
+{ "_id": 5,                                  "array": [ "A", "B" ], "object": { "zero": 0 } }
