@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "author": "Lucas Hrabovsky <hrabovsky.lucas@gmail.com> (http://imlucas.com)",
   "description": "MongoDB schema inference",
+  "main": "./lib",
   "scripts": {
     "test": "mocha",
     "dist": "gulp dist"
