@@ -4,6 +4,9 @@
   "author": "Lucas Hrabovsky <hrabovsky.lucas@gmail.com> (http://imlucas.com)",
   "description": "MongoDB schema inference",
   "main": "./lib",
+  "bin": {
+    "mongodb-infer": "bin/mongodb-infer.js"
+  },
   "scripts": {
     "test": "mocha",
     "dist": "gulp dist"
