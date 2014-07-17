@@ -3,6 +3,10 @@
   "version": "0.0.2",
   "author": "Lucas Hrabovsky <hrabovsky.lucas@gmail.com> (http://imlucas.com)",
   "description": "MongoDB schema inference",
+  "main": "./lib",
+  "bin": {
+    "mongodb-infer": "bin/mongodb-infer.js"
+  },
   "scripts": {
     "test": "mocha",
     "dist": "gulp dist"
@@ -22,10 +26,10 @@
     "tableize": "0.0.4",
     "underscore": "^1.6.0",
     "JSONStream": "^0.8.4",
-    "event-stream": "^3.1.5",
-    "coffee-script": "^1.7.1"
+    "event-stream": "^3.1.5"
   },
   "devDependencies": {
+    "coffee-script": "^1.7.1",
     "browserify": "^4.1.6",
     "mocha": "^1.20.1",
     "zuul": "^1.7.0",
@@ -35,6 +39,8 @@
     "vinyl-source-stream": "^0.1.1",
     "github-release": "^0.0.2",
     "ecstatic": "^0.5.3",
-    "mocha": "^1.20.1"
+    "mocha": "^1.20.1",
+    "gulp-coffee": "^2.1.1",
+    "gulp-util": "^2.2.20"
   }
 }

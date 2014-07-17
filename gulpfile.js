@@ -6,7 +6,9 @@ var gulp = require('gulp'),
   rename = require('gulp-rename'),
   ecstatic = require('ecstatic'),
   http = require('http'),
-  exec = require('child_process').exec;
+  exec = require('child_process').exec,
+  coffee = require('gulp-coffee'),
+  gutil = require('gulp-util');
 
 
 function create(fn){
@@ -34,4 +36,10 @@ gulp.task('dist', function(){
   create(function(){
     gulp.src('./dist/*').pipe(release(pkg));
   });
+});
+
+gulp.task('coffee', function() {
+  gulp.src('./src/*.coffee')
+    .pipe(coffee({bare: true}).on('error', gutil.log))
+    .pipe(gulp.dest('./lib/'));
 });
