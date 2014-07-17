@@ -7,7 +7,8 @@ var gulp = require('gulp'),
   ecstatic = require('ecstatic'),
   http = require('http'),
   exec = require('child_process').exec,
-  coffee = require('gulp-coffee');
+  coffee = require('gulp-coffee'),
+  gutil = require('gulp-util');
 
 
 function create(fn){

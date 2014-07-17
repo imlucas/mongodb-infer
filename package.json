@@ -37,6 +37,7 @@
     "github-release": "^0.0.2",
     "ecstatic": "^0.5.3",
     "mocha": "^1.20.1",
-    "gulp-coffee": "^2.1.1"
+    "gulp-coffee": "^2.1.1",
+    "gulp-util": "^2.2.20"
   }
 }
