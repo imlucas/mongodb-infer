@@ -1,5 +1,7 @@
 # mongodb-infer
 
+## DEPRECATED: Please see [mongodb-schema](https://github.com/mongodb-js/mongodb-schema) for your schema inference needs.
+
 [![build status](https://secure.travis-ci.org/imlucas/mongodb-infer.png)](http://travis-ci.org/imlucas/mongodb-infer)
 
 MongoDB schema inference
