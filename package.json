@@ -1,6 +1,6 @@
 {
   "name": "mongodb-infer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Lucas Hrabovsky <hrabovsky.lucas@gmail.com> (http://imlucas.com)",
   "description": "MongoDB schema inference",
   "scripts": {
@@ -30,7 +30,6 @@
     "gulp-rename": "^1.2.0",
     "vinyl-source-stream": "^0.1.1",
     "github-release": "^0.0.2",
-    "ecstatic": "^0.5.3",
-    "mocha": "^1.20.1"
+    "ecstatic": "^0.5.3"
   }
 }
